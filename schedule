@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>คิววิดีโอ AI - Boss's Car</title>
+    <!-- Google Fonts: Kanit -->
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { 'kanit': ['Kanit', 'sans-serif'] },
+                    colors: {
+                        tiktok: '#00f2ea',
+                        tiktok_red: '#ff0050',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        premium_gold: '#D4AF37'
+                    },
+                    animation: {
+                        'spin-slow': 'spin 3s linear infinite',
+                        'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
+                        'ai-wave': 'aiWave 1.5s ease-in-out infinite',
+                        'scan': 'scanLine 3s linear infinite',
+                    },
+                    keyframes: {
+                        pulseGlow: {
+                            '0%, 100%': { boxShadow: '0 0 10px rgba(0, 242, 234, 0.2)' },
+                            '50%': { boxShadow: '0 0 25px rgba(0, 242, 234, 0.6)' },
+                        },
+                        aiWave: {
+                            '0%, 100%': { opacity: '0.4', transform: 'scaleY(1)' },
+                            '50%': { opacity: '1', transform: 'scaleY(1.5)' },
+                        },
+                        scanLine: {
+                            '0%': { top: '-10%' },
+                            '100%': { top: '110%' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: radial-gradient(circle at top, #1e293b 0%, #000000 100%);
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .featured-card {
+            background: linear-gradient(145deg, rgba(0, 242, 234, 0.15) 0%, rgba(255, 0, 80, 0.05) 100%);
+            border: 1px solid rgba(0, 242, 234, 0.3);
+        }
+        .status-doing { background: rgba(0, 242, 232, 0.2); color: #00f2ea; border: 1px solid #00f2ea; }
+        .status-pending { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b; }
+        .status-done { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid #10b981; }
+        
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00f2ea, transparent);
+            z-index: 5;
+            box-shadow: 0 0 15px #00f2ea;
+        }
+
+        .loading-shimmer {
+            background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.03) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        
+        /* Bottom Nav Fix */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 100;
+        }
+    </style>
+</head>
+<body class="text-white p-4 pb-32">
+
+    <div class="max-w-md mx-auto space-y-6">
+        
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-4">
+            <a href="index.html" class="w-10 h-10 glass-card rounded-full flex items-center justify-center">
+                <i class="fa-solid fa-arrow-left text-xs text-gray-400"></i>
+            </a>
+            <div class="text-center">
+                <h1 class="text-xl font-black italic uppercase tracking-tighter">AI Video Queue</h1>
+                <p id="sync-status" class="text-[9px] text-tiktok uppercase tracking-widest font-bold">● Tracking Requests</p>
+            </div>
+            <div class="w-10 h-10 flex items-center justify-center text-tiktok_red">
+                <i class="fa-brands fa-tiktok text-xl"></i>
+            </div>
+        </div>
+
+        <!-- Support/Donate Quick Access (Link Updated) -->
+        <a href="https://monsterseason32-lgtm.github.io/donate/" target="_blank" class="glass-card rounded-2xl p-4 flex items-center justify-between border-premium_gold/30 hover:bg-premium_gold/10 transition-all group">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-premium_gold/20 rounded-full flex items-center justify-center">
+                    <i class="fa-solid fa-coffee text-premium_gold"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] font-black text-premium_gold uppercase tracking-wider">Support Creator</p>
+                    <p class="text-xs text-gray-300">โดเนทสนับสนุน / เร่งคิววิดีโอ</p>
+                </div>
+            </div>
+            <i class="fa-solid fa-chevron-right text-gray-600 group-hover:text-premium_gold transition-colors"></i>
+        </a>
+
+        <!-- Call to Action for Followers -->
+        <div class="glass-card rounded-[2rem] p-5 border-tiktok/20 space-y-4 relative overflow-hidden">
+            <div class="flex items-center gap-4 relative z-10">
+                <div class="w-12 h-12 rounded-full bg-tiktok/20 flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-wand-magic-sparkles text-tiktok"></i>
+                </div>
+                <div class="flex-1">
+                    <p class="text-[10px] font-bold text-tiktok uppercase tracking-widest">How to request?</p>
+                    <p class="text-xs text-gray-300 leading-snug">พิมพ์รุ่นรถที่อยากให้ซ่อมในคอมเมนต์ TikTok ของผมได้เลย!</p>
+                </div>
+            </div>
+            <a href="https://www.tiktok.com/@bosscar.th" target="_blank" class="w-full bg-white text-black py-3 rounded-2xl flex items-center justify-center gap-2 font-black italic uppercase text-xs hover:bg-tiktok hover:text-black transition-all active:scale-95 shadow-lg relative z-10">
+                <i class="fa-brands fa-tiktok text-lg"></i>
+                ไปที่หน้า TikTok ของผม
+            </a>
+        </div>
+
+        <!-- Summary Stats -->
+        <div class="grid grid-cols-3 gap-3">
+            <div class="glass-card rounded-2xl p-3 text-center border-b border-white/10">
+                <p class="text-[9px] text-gray-500 uppercase font-bold">Requests</p>
+                <p class="text-xl font-black" id="total-count">-</p>
+            </div>
+            <div class="glass-card rounded-2xl p-3 text-center border-b-2 border-tiktok">
+                <p class="text-[9px] text-tiktok uppercase font-bold">Processing</p>
+                <p class="text-xl font-black" id="doing-count">-</p>
+            </div>
+            <div class="glass-card rounded-2xl p-3 text-center border-b-2 border-success">
+                <p class="text-[9px] text-success uppercase font-bold">Uploaded</p>
+                <p class="text-xl font-black" id="done-count">-</p>
+            </div>
+        </div>
+
+        <!-- Dynamic List Container -->
+        <div class="space-y-6" id="queue-container">
+            <div id="featured-section" class="space-y-4"></div>
+            
+            <div class="space-y-3" id="normal-list-section">
+                <div class="flex items-center justify-between px-2">
+                    <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                        <i class="fa-solid fa-hourglass-half"></i> คิวรอดำเนินการ
+                    </h3>
+                    <span id="queue-time-badge" class="text-[9px] text-tiktok font-bold italic opacity-60 uppercase">Real-time Data</span>
+                </div>
+                <div id="queue-list" class="space-y-3">
+                    <div class="glass-card rounded-2xl p-4 h-20 loading-shimmer"></div>
+                    <div class="glass-card rounded-2xl p-4 h-20 loading-shimmer"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ Footer -->
+        <div class="pt-10 pb-6 text-center space-y-4 border-t border-white/5">
+            <h4 class="text-[10px] font-bold text-gray-600 uppercase tracking-[0.3em]">AI Processing FAQ</h4>
+            <div class="grid grid-cols-1 gap-2">
+                <div class="glass-card rounded-xl p-3 text-left">
+                    <p class="text-[10px] text-tiktok font-bold mb-1 italic">คิวจะเสร็จเมื่อไหร่?</p>
+                    <p class="text-[10px] text-gray-500">งาน AI ใช้เวลาเรนเดอร์และคัดเลือกคอมเมนต์ 1-2 วันครับ</p>
+                </div>
+                <div class="glass-card rounded-xl p-3 text-left">
+                    <p class="text-[10px] text-tiktok_red font-bold mb-1 italic">ทำไมคิวผมหายไป?</p>
+                    <p class="text-[10px] text-gray-500">คิวที่ "เสร็จแล้ว" จะค่อยๆ ถูกนำออกเพื่อแสดงพื้นที่ให้คิวใหม่ๆ</p>
+                </div>
+            </div>
+            <p class="text-[9px] text-gray-700 italic">Developed for Boss's Car Community</p>
+        </div>
+
+    </div>
+
+    <!-- Bottom Navigation Bar (Link Updated) -->
+    <nav class="bottom-nav flex items-center justify-around px-6">
+        <a href="schedule.html" class="flex flex-col items-center gap-1 text-tiktok">
+            <i class="fa-solid fa-list-check text-xl"></i>
+            <span class="text-[9px] font-bold uppercase tracking-widest">Queue</span>
+        </a>
+        <a href="index.html" class="w-12 h-12 bg-white rounded-full flex items-center justify-center -translate-y-6 shadow-xl shadow-tiktok/20 border-4 border-[#0f172a]">
+            <i class="fa-solid fa-house text-black text-lg"></i>
+        </a>
+        <a href="https://monsterseason32-lgtm.github.io/donate/" target="_blank" class="flex flex-col items-center gap-1 text-gray-500 hover:text-premium_gold transition-colors">
+            <i class="fa-solid fa-heart text-xl"></i>
+            <span class="text-[9px] font-bold uppercase tracking-widest">Donate</span>
+        </a>
+    </nav>
+
+    <script>
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyXBprtFUs6pOXQ5JeJI3RekJHSaDduZ16sqIe3UDefr-osYdvrw-iys-6rCE_JGnee/exec'; 
+        const REFRESH_INTERVAL = 20000; 
+        let lastDataHash = "";
+
+        async function fetchQueues(isAuto = false) {
+            if (!APPS_SCRIPT_URL) return;
+            const statusText = document.getElementById('sync-status');
+            statusText.innerText = "● Syncing...";
+
+            try {
+                const response = await fetch(APPS_SCRIPT_URL);
+                const data = await response.json();
+                
+                const currentHash = JSON.stringify(data);
+                if (currentHash !== lastDataHash) {
+                    renderDashboard(data);
+                    lastDataHash = currentHash;
+                }
+                statusText.innerText = "● Live Tracking";
+            } catch (error) {
+                statusText.innerText = "● Link Error";
+            }
+        }
+
+        function renderDashboard(data) {
+            document.getElementById('total-count').innerText = data.length;
+            const doingList = data.filter(i => (i.status || "").toLowerCase().includes('doing') || (i.status || "").includes('ทำ'));
+            const doneCount = data.filter(i => (i.status || "").toLowerCase().includes('done') || (i.status || "").includes('เสร็จ')).length;
+            
+            document.getElementById('doing-count').innerText = doingList.length;
+            document.getElementById('done-count').innerText = doneCount;
+
+            const featuredSection = document.getElementById('featured-section');
+            const normalList = document.getElementById('queue-list');
+            
+            featuredSection.innerHTML = '';
+            normalList.innerHTML = '';
+
+            if (doingList.length > 0) {
+                const item = doingList[0];
+                featuredSection.innerHTML = `
+                    <div class="featured-card rounded-[2.5rem] p-6 relative overflow-hidden animate-pulse-glow">
+                        <div class="scan-line animate-scan"></div>
+                        <div class="absolute -right-6 -bottom-6 opacity-10">
+                            <i class="fa-solid fa-microchip text-[10rem]"></i>
+                        </div>
+                        <div class="relative z-10 space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span class="bg-tiktok_red text-white text-[9px] font-black px-3 py-1 rounded-full uppercase italic flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 bg-white rounded-full animate-ping"></span>
+                                    AI Generating...
+                                </span>
+                                <div class="flex gap-1 items-end h-4">
+                                    <div class="w-1 bg-tiktok animate-ai-wave h-2" style="animation-delay: 0.1s"></div>
+                                    <div class="w-1 bg-tiktok animate-ai-wave h-4" style="animation-delay: 0.2s"></div>
+                                    <div class="w-1 bg-tiktok animate-ai-wave h-3" style="animation-delay: 0.3s"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <h2 class="text-3xl font-black italic uppercase leading-tight text-white tracking-tighter">${item.carModel || 'Request Car'}</h2>
+                                <p class="text-tiktok text-xs font-bold mt-1 flex items-center gap-1">
+                                    <i class="fa-brands fa-tiktok"></i> @${item.customerName || 'Follower'}
+                                </p>
+                            </div>
+                            <div class="bg-black/60 rounded-2xl p-4 border border-white/10 backdrop-blur-sm">
+                                <div class="flex justify-between items-center mb-2">
+                                    <p class="text-[10px] text-gray-500 uppercase font-black">AI Stage</p>
+                                    <span class="text-[9px] text-tiktok font-bold italic tracking-widest uppercase">Analyzing Frame...</span>
+                                </div>
+                                <p class="text-xs leading-relaxed text-gray-200 font-medium italic">${item.details || 'กำลังวิเคราะห์ภาพคอมเมนต์และสร้างวิดีโอจำลอง...'}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            data.forEach((item, index) => {
+                const statusStr = (item.status || "").toLowerCase();
+                const isDoing = statusStr.includes('doing') || statusStr.includes('ทำ');
+                const isDone = statusStr.includes('done') || statusStr.includes('เสร็จ');
+                
+                if (isDoing && item === doingList[0]) return;
+
+                let statusHTML = `<span class="text-[9px] px-3 py-1 rounded-full font-bold uppercase status-pending shadow-sm">Waiting</span>`;
+                if (isDone) statusHTML = `<a href="${item.videoLink || '#'}" target="_blank" class="text-[9px] px-3 py-1 rounded-full font-bold uppercase status-done flex items-center gap-1 shadow-sm">View Post <i class="fa-solid fa-external-link text-[7px]"></i></a>`;
+                
+                normalList.innerHTML += `
+                    <div class="glass-card rounded-2xl p-4 flex items-center gap-4 hover:bg-white/10 transition-all group">
+                        <div class="w-12 h-12 rounded-xl bg-white/5 flex flex-col items-center justify-center border border-white/10 group-hover:border-tiktok/30 transition-colors">
+                            <span class="text-[8px] font-bold text-gray-500 uppercase tracking-tighter">Queue</span>
+                            <span class="text-lg font-black italic group-hover:text-tiktok">${(index + 1).toString().padStart(2, '0')}</span>
+                        </div>
+                        <div class="flex-1 overflow-hidden">
+                            <h4 class="font-bold text-sm text-gray-200 truncate group-hover:text-white">${item.carModel || 'Unknown Car'}</h4>
+                            <p class="text-[10px] text-gray-500 font-bold truncate">By @${item.customerName || 'Follower'}</p>
+                        </div>
+                        <div class="text-right shrink-0">
+                            ${statusHTML}
+                        </div>
+                    </div>
+                `;
+            });
+
+            if (normalList.innerHTML === '') {
+                document.getElementById('normal-list-section').classList.add('hidden');
+            } else {
+                document.getElementById('normal-list-section').classList.remove('hidden');
+            }
+        }
+
+        window.onload = () => {
+            fetchQueues();
+            setInterval(() => fetchQueues(true), REFRESH_INTERVAL);
+        };
+    </script>
+</body>
+</html>
